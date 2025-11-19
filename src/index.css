@@ -1,0 +1,977 @@
+/* =========================================
+   PALETTE – simplified to match screenshot
+   ========================================= */
+:root {
+  /* Backgrounds */
+  --bg-main: #f4f6f9;           /* page background (light grey) */
+  --bg-sidebar: #243646;        /* left sidebar blue */
+  --bg-card: #ffffff;           /* contact + detail cards */
+  --bg-card-hover: #f8fafc;
+
+  /* Borders */
+  --border-subtle: #d9e1e6;
+
+  /* Text */
+  --text-main: #2c3e50;         /* dark slate */
+  --text-muted: #7b8a97;        /* muted grey */
+
+  /* Accent (teal) */
+  --accent-primary: #00bcd4;    /* cyan/teal buttons, stars, etc. */
+  --accent-primary-soft: #e0f7fa;
+
+  /* Soft chip backgrounds */
+  --accent-yellow-soft: #fff8e1;
+  --accent-blue-soft: #e0f7fa;
+
+  /* Radius & shadow */
+  --radius-lg: 16px;
+  --radius-md: 10px;
+  --shadow-soft: 0 4px 12px rgba(15, 23, 42, 0.08);
+}
+
+/* =========================================
+   GLOBAL
+   ========================================= */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI",
+    sans-serif;
+  background-color: var(--bg-main);
+  color: var(--text-main);
+}
+
+.muted {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* =========================================
+   MAIN CONTACTS LAYOUT
+   ========================================= */
+.contacts-page {
+  display: flex;
+  gap: 24px;
+  min-height: 100vh;
+}
+
+/* Left profile panel */
+.contacts-profile {
+  width: 260px;
+  flex-shrink: 0;
+  background: var(--bg-sidebar);
+}
+
+.profile-rail {
+  height: 100%;
+  background: var(--bg-sidebar);
+  padding: 24px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* make sidebar text white like ref */
+.profile-title,
+.profile-name,
+.profile-email,
+.profile-meta-row span {
+  color: #ffffff;
+}
+
+.profile-title {
+  font-size: 2.1rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-avatar-wrap {
+  width: 96px;
+  height: 96px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #32495c;
+}
+
+.profile-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-meta {
+  width: 100%;
+  margin-top: 12px;
+}
+
+.profile-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 0;
+  font-size: 0.9rem;
+}
+
+.meta-ico {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  background: #1f2f3d;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ffffff;
+}
+
+/* =========================================
+   MAIN CONTENT
+   ========================================= */
+.contacts-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px 24px 24px 0;
+}
+
+/* Top bar */
+.contacts-topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.topbar-title {
+  font-size: 1.4rem;
+  font-weight: 700;
+  /* NEW: keep the title on one line and stop flex from shrinking it */
+  white-space: nowrap;
+  flex-shrink: 0;
+  margin-right: 16px; /* small gap before the filters */
+}
+
+
+/* =========================================
+   TOOLBAR
+   ========================================= */
+.contacts-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.contacts-toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pill-group {
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: #e1e7ee;
+}
+
+.pill {
+  border: none;
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.pill-active {
+  background: #ffffff;
+  color: var(--accent-primary);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.16);
+}
+
+.sort-select {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.sort-select select {
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 2px 10px;
+  background: #ffffff;
+  font-size: 0.8rem;
+}
+
+.contacts-count {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* Right side of toolbar */
+.contacts-toolbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.search-wrap {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  background: #ffffff;
+  padding: 4px 10px;
+}
+
+.search-wrap i {
+  color: var(--text-muted);
+}
+
+.search-wrap input {
+  border: none;
+  outline: none;
+  font-size: 0.85rem;
+  min-width: 180px;
+  background: transparent;
+}
+
+.icon-btn {
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.icon-btn i {
+  color: var(--text-muted);
+}
+
+.btn-new-contact {
+  border: none;
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: var(--accent-primary);
+  color: #ffffff;
+  font-size: 0.85rem;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 188, 212, 0.4);
+}
+
+/* =========================================
+   BODY LAYOUT
+   ========================================= */
+.contacts-body {
+  display: flex;
+  gap: 16px;
+}
+
+.contacts-list-wrapper {
+  flex: 1;
+}
+
+.contacts-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Letter header */
+.letter-row {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin: 10px 4px 4px;
+}
+
+/* =========================================
+   CONTACT ROW CARD
+   ========================================= */
+.contact-row-card {
+  position: relative;                 /* ✅ make it a stacking context */
+  z-index: 1;                         /* base layer */
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--bg-card);
+  padding: 10px 14px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-soft);
+  cursor: pointer;
+  transition: 0.1s ease;
+}
+
+.contact-row-card:hover {
+  background: var(--bg-card-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.12);
+  z-index: 5;                         /* hovered card above neighbors */
+}
+
+/* when menu is open, force this card on top of everything nearby */
+.contact-row-card--menu-open {
+  z-index: 50;
+}
+
+.contact-row-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.contact-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  overflow: hidden;
+  background: #e0f2fe;
+}
+
+.contact-avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.contact-main {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.contact-name-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.contact-name {
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.contact-tag {
+  background: var(--accent-primary-soft);
+  border-radius: 999px;
+  padding: 2px 6px;
+  font-size: 0.75rem;
+  color: var(--accent-primary);
+}
+
+.contact-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* actions */
+.contact-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  position: relative;
+}
+
+.star-btn,
+.dots-btn {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  background: #ffffff;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.star-btn i,
+.dots-btn i {
+  color: var(--text-muted);
+}
+
+.star-btn-active {
+  background: var(--accent-primary-soft) !important;
+  border-color: var(--accent-primary) !important;
+}
+
+.star-btn-active i {
+  color: var(--accent-primary) !important;
+}
+
+/* custom dropdown menu */
+.contact-menu {
+  position: absolute;
+  top: 38px;
+  right: 0;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.12);
+  padding: 4px 0;
+  z-index: 999;                       /* stays above cards */
+  min-width: 120px;
+}
+
+
+.contact-menu-item {
+  width: 100%;
+  text-align: left;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.contact-menu-item:hover {
+  background: #f3f5f7;
+}
+
+.contact-menu-danger {
+  color: #e11d48;
+}
+
+/* =========================================
+   RIGHT DETAIL PANEL
+   ========================================= */
+.contacts-detail {
+  width: 280px;
+  flex-shrink: 0;
+  padding: 16px 0 16px 0;
+}
+
+.detail-panel {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  box-shadow: var(--shadow-soft);
+  min-height: 260px;
+  width: 100%;
+}
+
+.detail-empty {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+  text-align: center;
+  padding-top: 40px;
+}
+
+.detail-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-avatar-wrap {
+  width: 72px;
+  height: 72px;
+  border-radius: 24px;
+  overflow: hidden;
+  background: #e0f2fe;
+}
+
+.detail-avatar {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.detail-role {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+}
+
+/* tabs */
+.detail-tabs {
+  margin-top: 16px;
+  display: inline-flex;
+  padding: 2px;
+  border-radius: 999px;
+  background: #e1e7ee;
+}
+
+.detail-tab {
+  border: none;
+  background: transparent;
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.detail-tab.active {
+  background: #ffffff;
+  color: var(--accent-primary);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.16);
+}
+
+.detail-body {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.detail-label {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+}
+
+.detail-value {
+  font-size: 0.9rem;
+}
+
+.detail-icon-chip {
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 999px;
+  border: none;
+  cursor: pointer;
+}
+
+.chip-call {
+  background: var(--accent-blue-soft);
+}
+
+.chip-mail {
+  background: var(--accent-yellow-soft);
+}
+
+/* Recently added */
+.detail-recent {
+  margin-top: 18px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-subtle);
+}
+
+.detail-recent-title {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.detail-recent-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.detail-recent-item {
+  background: #ffffff;           /* white like other cards */
+  border-radius: 10px;
+  padding: 6px 10px;
+  border: 1px solid #edf1f5;
+}
+
+.detail-recent-name {
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.detail-recent-role {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* =========================================
+   PAGINATION
+   ========================================= */
+.contacts-pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.page-btn {
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  width: 28px;
+  height: 28px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.page-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.page-info {
+  min-width: 90px;
+  text-align: center;
+}
+
+/* =========================================
+   RESPONSIVE
+   ========================================= */
+@media (max-width: 992px) {
+  .contacts-page {
+    flex-direction: column;
+  }
+
+  .contacts-profile {
+    width: 100%;
+  }
+
+  .contacts-main {
+    padding: 16px;
+  }
+
+  .contacts-body {
+    flex-direction: column;
+  }
+
+  .contacts-detail {
+    width: 100%;
+  }
+}
+
+/* =========================================
+   LANDING / AUTH PAGES
+   ========================================= */
+
+/* =============================
+   FULLSCREEN LANDING / SIGNUP
+   ============================= */
+
+.landing-page {
+  position: relative;
+  width: 100%;
+  min-height: 100vh;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Dark tint */
+.landing-hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+}
+
+/* Inner content (title + card) */
+.landing-content {
+  position: relative;
+  width: 100%;
+  max-width: 1200px;
+  padding: 32px 32px 40px 80px;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 80px;
+}
+
+/* Left text */
+.landing-vignette {
+  color: #ffffff;
+  max-width: 560px;
+}
+
+.landing-vignette-title {
+  font-size: 3.8rem;      /* was 3.4rem → ~1.1x larger */
+  font-weight: 800;
+  margin: 0 0 10px 0;
+}
+
+.landing-vignette-text {
+  font-size: 1.1rem;
+  opacity: 0.92;
+  line-height: 1.5;
+}
+
+/* Colored "PeoplePad" word */
+.landing-brand-accent {
+  color: var(--accent-primary);
+}
+
+/* Right card (login / signup) */
+.landing-auth-card {
+  width: 100%;
+  max-width: 480px;
+  background: #ffffff;
+  border-radius: 18px;
+  box-shadow: 0 14px 36px rgba(15, 23, 42, 0.4);
+  padding: 32px 28px 26px;
+}
+
+.landing-auth-header {
+  margin-bottom: 20px;
+}
+
+.landing-app-pill {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: var(--accent-primary-soft);
+  color: var(--accent-primary);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: 600;
+}
+
+.landing-auth-header h2 {
+  margin: 12px 0 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+
+/* Form */
+.landing-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 6px;
+}
+
+.landing-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.landing-field label {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.landing-field input {
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  padding: 10px 16px;
+  font-size: 1rem;
+  outline: none;
+  background: #ffffff;
+}
+
+.landing-field input:focus {
+  border-color: var(--accent-primary);
+  box-shadow: 0 0 0 2px var(--accent-primary-soft);
+}
+
+/* Error */
+.landing-error {
+  color: #f97373;
+  font-size: 0.8rem;
+}
+
+/* Button */
+.landing-btn {
+  margin-top: 6px;
+  width: 100%;
+  border: none;
+  border-radius: 999px;
+  padding: 11px 16px;
+  background: var(--accent-primary);
+  color: #ffffff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 188, 212, 0.4);
+}
+
+.landing-btn:hover {
+  background: #00a3ba;
+}
+
+/* Footer text */
+.landing-footer-text {
+  margin-top: 16px;
+  font-size: 0.85rem;
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.landing-link {
+  color: var(--accent-primary);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.landing-link:hover {
+  text-decoration: underline;
+}
+
+/* Signup page */
+.signup-page {
+  min-height: 100vh;
+  background: var(--bg-main);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 24px;
+}
+
+.signup-card {
+  width: 360px;
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px 24px 28px;
+  box-shadow: var(--shadow-soft);
+}
+
+.signup-card h2 {
+  margin: 0 0 6px;
+}
+
+.signup-sub {
+  margin: 0 0 16px;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.signup-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.signup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.signup-field label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+.signup-field input {
+  border-radius: 8px;
+  border: 1px solid var(--border-subtle);
+  padding: 7px 9px;
+  font-size: 0.9rem;
+}
+
+.signup-field input:focus {
+  outline: 2px solid var(--accent-primary-soft);
+  border-color: var(--accent-primary);
+}
+
+.signup-btn {
+  margin-top: 4px;
+  border: none;
+  border-radius: 999px;
+  padding: 8px 0;
+  background: var(--accent-primary);
+  color: #ffffff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.signup-btn:hover {
+  background: #00a2bc;
+}
+
+.signup-footer-text {
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* Responsive stacking */
+@media (max-width: 900px) {
+  .landing-content {
+    padding: 24px 16px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
+
+  .landing-auth-card {
+    max-width: 100%;
+  }
+
+  .landing-vignette-title {
+    font-size: 2.4rem;
+  }
+
+  .landing-vignette-text {
+    font-size: 1rem;
+  }
+}
+
+.contacts-topbar-right {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.logout-btn {
+  border: 1px solid var(--border-subtle);
+  border-radius: 999px;
+  padding: 6px 14px;
+  background: #ffffff;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background: #f3f5f7;
+}
