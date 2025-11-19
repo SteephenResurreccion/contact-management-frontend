@@ -47,7 +47,8 @@ export default function LandingPage() {
         {/* LEFT TEXT */}
         <div className="landing-vignette">
           <h1 className="landing-vignette-title">
-            Welcome to <span className="landing-brand-accent">PeoplePad</span>
+            Welcome to<br />
+            <span className="landing-brand-accent">PeoplePad</span>
           </h1>
 
           <p className="landing-vignette-text">
