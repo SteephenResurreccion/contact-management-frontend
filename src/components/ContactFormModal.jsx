@@ -17,6 +17,9 @@ function isValidPhone(phone) {
 export default function ContactFormModal({ show, mode, initial, onClose, onSave }) {
     const [form, setForm] = useState(emptyForm);
     const [errors, setErrors] = useState({});
+    const [profilePictureFile, setProfilePictureFile] = useState(null);
+    const [profilePicturePreview, setProfilePicturePreview] = useState(null);
+    const fileInputRef = React.useRef(null);
 
     useEffect(() => {
         if (initial && mode === "edit") {
@@ -33,9 +36,12 @@ export default function ContactFormModal({ show, mode, initial, onClose, onSave 
                 notes: initial.notes || "",
                 starred: initial.starred || false,
             });
+            setProfilePicturePreview(initial.profilePicture || null);
         } else {
             setForm(emptyForm);
+            setProfilePicturePreview(null);
         }
+        setProfilePictureFile(null);
         setErrors({});
     }, [initial, mode, show]);
 
@@ -44,6 +50,41 @@ export default function ContactFormModal({ show, mode, initial, onClose, onSave 
             const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
             setForm((prev) => ({ ...prev, [field]: value }));
         };
+    }
+
+    function handleFileChange(e) {
+        const file = e.target.files?.[0];
+        if (file) {
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+                setErrors({ profilePicture: "Please select an image file." });
+                return;
+            }
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                setErrors({ profilePicture: "Image size must be less than 5MB." });
+                return;
+            }
+            
+            setProfilePictureFile(file);
+            setErrors({ ...errors, profilePicture: null });
+            
+            // Create preview
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfilePicturePreview(reader.result);
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    function removeProfilePicture() {
+        setProfilePictureFile(null);
+        setProfilePicturePreview(null);
+        setForm((prev) => ({ ...prev, profilePicture: "" }));
+        if (fileInputRef.current) {
+            fileInputRef.current.value = "";
+        }
     }
 
     function handleSocialMediaChange(index, value) {
@@ -64,7 +105,7 @@ export default function ContactFormModal({ show, mode, initial, onClose, onSave 
         setForm((prev) => ({ ...prev, socialMedia: newSocialMedia }));
     }
 
-    function handleSubmit(e) {
+    async function handleSubmit(e) {
         e.preventDefault();
         const newErrors = {};
         if (!form.firstName.trim()) newErrors.firstName = "First Name is required.";
@@ -74,21 +115,153 @@ export default function ContactFormModal({ show, mode, initial, onClose, onSave 
 
         if (Object.keys(newErrors).length > 0) { setErrors(newErrors); return; }
         setErrors({});
-        onSave(form);
+        
+        // If a new file was selected, convert it to base64
+        let finalProfilePicture = form.profilePicture;
+        if (profilePictureFile) {
+            finalProfilePicture = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(profilePictureFile);
+            });
+        }
+        
+        onSave({ ...form, profilePicture: finalProfilePicture });
     }
 
     const title = mode === "edit" ? "Edit Contact" : "Add New Contact";
     const socialMediaDisplay = form.socialMedia.length === 0 && mode !== 'edit' ? [""] : form.socialMedia;
 
     return (
-        <Modal show={show} onHide={onClose} size="lg" centered>
+        <Modal show={show} onHide={onClose} size="lg" centered className="contact-form-modal">
             <Form onSubmit={handleSubmit}>
-                <Modal.Header closeButton><Modal.Title>{title}</Modal.Title></Modal.Header>
-                <Modal.Body>
-                    <Row className="mb-3">
+                <Modal.Header closeButton style={{ 
+                    borderBottom: "2px solid var(--border-light)",
+                    padding: "var(--spacing-lg) var(--spacing-xl)"
+                }}>
+                    <Modal.Title style={{ 
+                        fontSize: "var(--font-xl)",
+                        fontWeight: "var(--font-bold)",
+                        display: "flex",
+                        alignItems: "center",
+                        gap: "var(--spacing-sm)"
+                    }}>
+                        <i className={`bi ${mode === "edit" ? "bi-pencil-square" : "bi-person-plus"}`} style={{ color: "var(--accent-primary)" }}></i>
+                        {title}
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body style={{ padding: "var(--spacing-xl)" }}>
+                    <Row className="mb-4">
                         <Form.Group as={Col} md={12}>
-                            <Form.Label>Profile Picture (URL)</Form.Label>
-                            <Form.Control type="url" value={form.profilePicture} onChange={handleChange("profilePicture")} placeholder="https://example.com/image.jpg" />
+                            <Form.Label style={{ 
+                                fontSize: "var(--font-sm)",
+                                fontWeight: "var(--font-semibold)",
+                                marginBottom: "var(--spacing-sm)"
+                            }}>
+                                Profile Picture
+                            </Form.Label>
+                            <div style={{ 
+                                display: "flex", 
+                                alignItems: "center", 
+                                gap: "var(--spacing-md)",
+                                flexWrap: "wrap"
+                            }}>
+                                {profilePicturePreview && (
+                                    <div style={{ 
+                                        position: "relative",
+                                        width: "80px",
+                                        height: "80px",
+                                        borderRadius: "var(--radius-lg)",
+                                        overflow: "hidden",
+                                        border: "2px solid var(--border-light)",
+                                        boxShadow: "var(--shadow-sm)"
+                                    }}>
+                                        <img 
+                                            src={profilePicturePreview} 
+                                            alt="Preview" 
+                                            style={{ 
+                                                width: "100%", 
+                                                height: "100%", 
+                                                objectFit: "cover" 
+                                            }} 
+                                        />
+                                        <button
+                                            type="button"
+                                            onClick={removeProfilePicture}
+                                            style={{
+                                                position: "absolute",
+                                                top: "4px",
+                                                right: "4px",
+                                                background: "rgba(0, 0, 0, 0.7)",
+                                                color: "white",
+                                                border: "none",
+                                                borderRadius: "50%",
+                                                width: "24px",
+                                                height: "24px",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                cursor: "pointer",
+                                                fontSize: "12px"
+                                            }}
+                                        >
+                                            <i className="bi bi-x"></i>
+                                        </button>
+                                    </div>
+                                )}
+                                <div style={{ flex: 1, minWidth: "200px" }}>
+                                    <input
+                                        ref={fileInputRef}
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={handleFileChange}
+                                        style={{ display: "none" }}
+                                        id="profile-picture-upload"
+                                    />
+                                    <label
+                                        htmlFor="profile-picture-upload"
+                                        style={{
+                                            display: "inline-block",
+                                            padding: "var(--spacing-sm) var(--spacing-lg)",
+                                            background: "var(--bg-card)",
+                                            border: "1px solid var(--border-default)",
+                                            borderRadius: "var(--radius-md)",
+                                            cursor: "pointer",
+                                            fontSize: "var(--font-sm)",
+                                            fontWeight: "var(--font-medium)",
+                                            transition: "all var(--transition-base)",
+                                            textAlign: "center",
+                                            width: "100%"
+                                        }}
+                                        onMouseEnter={(e) => {
+                                            e.target.style.background = "var(--bg-card-hover)";
+                                            e.target.style.borderColor = "var(--accent-primary)";
+                                        }}
+                                        onMouseLeave={(e) => {
+                                            e.target.style.background = "var(--bg-card)";
+                                            e.target.style.borderColor = "var(--border-default)";
+                                        }}
+                                    >
+                                        <i className="bi bi-upload me-2"></i>
+                                        {profilePicturePreview ? "Change Picture" : "Upload Picture"}
+                                    </label>
+                                    {errors.profilePicture && (
+                                        <div className="text-danger" style={{ 
+                                            fontSize: "var(--font-xs)",
+                                            marginTop: "var(--spacing-xs)"
+                                        }}>
+                                            {errors.profilePicture}
+                                        </div>
+                                    )}
+                                    <Form.Text className="text-muted" style={{ 
+                                        display: "block",
+                                        marginTop: "var(--spacing-xs)",
+                                        fontSize: "var(--font-xs)"
+                                    }}>
+                                        Supported formats: JPG, PNG, GIF (Max 5MB)
+                                    </Form.Text>
+                                </div>
+                            </div>
                         </Form.Group>
                     </Row>
                     <Row className="mb-3">
@@ -157,9 +330,33 @@ export default function ContactFormModal({ show, mode, initial, onClose, onSave 
                         </Form.Group>
                     </Row>
                 </Modal.Body>
-                <Modal.Footer>
-                    <Button variant="outline-secondary" onClick={onClose}>Cancel</Button>
-                    <Button type="submit" variant="primary">{mode === "edit" ? 'Save Changes' : 'Create Contact'}</Button>
+                <Modal.Footer style={{ 
+                    borderTop: "2px solid var(--border-light)",
+                    padding: "var(--spacing-lg) var(--spacing-xl)"
+                }}>
+                    <Button 
+                        variant="outline-secondary" 
+                        onClick={onClose}
+                        style={{
+                            padding: "var(--spacing-sm) var(--spacing-xl)",
+                            borderRadius: "var(--radius-md)",
+                            fontWeight: "var(--font-medium)"
+                        }}
+                    >
+                        Cancel
+                    </Button>
+                    <Button 
+                        type="submit" 
+                        variant="primary"
+                        style={{
+                            padding: "var(--spacing-sm) var(--spacing-xl)",
+                            borderRadius: "var(--radius-md)",
+                            fontWeight: "var(--font-semibold)"
+                        }}
+                    >
+                        <i className={`bi ${mode === "edit" ? "bi-check-lg" : "bi-plus-lg"} me-2`}></i>
+                        {mode === "edit" ? 'Save Changes' : 'Create Contact'}
+                    </Button>
                 </Modal.Footer>
             </Form>
         </Modal>

@@ -17,6 +17,20 @@ export function setUser(user) {
 export function isAuthenticated() { return !!getToken(); }
 export function clearAuth() { setToken(null); setUser(null); }
 
+// Profile picture helpers (frontend only, stored in localStorage)
+export function getProfilePicture() {
+  const user = getUser();
+  return user?.profilePicture || null;
+}
+
+export function setProfilePicture(profilePicture) {
+  const user = getUser();
+  if (user) {
+    user.profilePicture = profilePicture || '';
+    setUser(user);
+  }
+}
+
 async function apiRequest(endpoint, options = {}) {
   const url = `${API_BASE_URL}${endpoint}`;
   const token = getToken();
@@ -69,7 +83,17 @@ export const authAPI = {
   },
   async getProfile() { return apiRequest('/auth/profile'); },
   async updateProfile(username, email) {
-    return apiRequest('/auth/profile', { method: 'PUT', body: JSON.stringify({ username, email }) });
+    const data = await apiRequest('/auth/profile', { method: 'PUT', body: JSON.stringify({ username, email }) });
+    if (data.success && data.data.user) {
+      // Preserve profile picture from localStorage when updating profile
+      const currentProfilePicture = getProfilePicture();
+      const updatedUser = { ...data.data.user };
+      if (currentProfilePicture) {
+        updatedUser.profilePicture = currentProfilePicture;
+      }
+      setUser(updatedUser);
+    }
+    return data;
   },
   async changePassword(currentPassword, newPassword) {
     return apiRequest('/auth/change-password', { method: 'PUT', body: JSON.stringify({ currentPassword, newPassword }) });
@@ -117,6 +141,7 @@ function transformContactFromBackend(contact) {
     name: fullName, 
     email: contact.email || '',
     phone: contact.phone || '',
+    profilePicture: contact.profilePicture || '',
     company: contact.company || '',
     jobTitle: contact.jobTitle || '',
     address: contact.address || '',
@@ -132,6 +157,7 @@ function transformContactToBackend(contact) {
   return {
     firstName: contact.firstName,
     lastName: contact.lastName,
+    profilePicture: contact.profilePicture || '',
     company: contact.company,
     jobTitle: contact.jobTitle,
     address: contact.address,

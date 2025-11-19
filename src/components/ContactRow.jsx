@@ -70,18 +70,6 @@ export default function ContactRow({
         <div className="contact-info">
           <div className="contact-name">{contact.name}</div>
 
-          {/* Job/Company */}
-          {(contact.jobTitle || contact.company) && (
-            <div
-              className="contact-role small text-muted mb-1"
-              style={{ fontSize: "0.85rem" }}
-            >
-              {contact.jobTitle}
-              {contact.jobTitle && contact.company ? " • " : ""}
-              {contact.company}
-            </div>
-          )}
-
           <div className="contact-meta">
             {contact.phone && (
               <span>
@@ -95,8 +83,8 @@ export default function ContactRow({
             )}
           </div>
           
-          {/* 💥 NEW: Added Date Display */}
-          <div style={{ fontSize: "0.75rem", color: "#adb5bd", marginTop: "4px" }}>
+          {/* Added Date Display */}
+          <div style={{ fontSize: "11px", color: "var(--text-tertiary)", marginTop: "2px" }}>
             Added on {formatDate(contact.createdAt)}
           </div>
         </div>

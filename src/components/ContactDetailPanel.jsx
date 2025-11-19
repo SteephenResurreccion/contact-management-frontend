@@ -2,13 +2,24 @@
 import React, { useState, useEffect } from "react";
 import placeholder from "../assets/placeholder.png";
 
-export default function ContactDetailPanel({ contact, recentContacts }) {
+export default function ContactDetailPanel({ contact, recentContacts, onSelectContact }) {
   const [tab, setTab] = useState("contact"); // contact | work | about
 
   // Reset tab when contact changes
   useEffect(() => {
     setTab("contact");
   }, [contact]);
+
+  // Listen for contact selection from recent contacts
+  useEffect(() => {
+    const handleSelectContact = (e) => {
+      if (onSelectContact && e.detail) {
+        onSelectContact(e.detail);
+      }
+    };
+    window.addEventListener('selectContact', handleSelectContact);
+    return () => window.removeEventListener('selectContact', handleSelectContact);
+  }, [onSelectContact]);
 
   // Helper to format date
   const formatDate = (timestamp) => {
@@ -20,19 +31,47 @@ export default function ContactDetailPanel({ contact, recentContacts }) {
     });
   };
 
+  // When no contact is selected, show only "Recently added"
   if (!contact) {
     return (
-      <div className="detail-panel detail-empty">
-        Select a contact to see details.
+      <div className="detail-panel">
+        <div className="detail-recent">
+          <div className="detail-recent-title">Recently added</div>
+          <ul className="detail-recent-list">
+            {recentContacts && recentContacts.length > 0 ? (
+              recentContacts.map((c) => (
+                <li 
+                  key={c.id} 
+                  className="detail-recent-item"
+                  style={{ cursor: "pointer" }}
+                  onClick={() => {
+                    if (onSelectContact) {
+                      onSelectContact(c);
+                    }
+                  }}
+                >
+                  <div className="detail-recent-name">{c.name}</div>
+                  <div className="detail-recent-role">
+                    {c.company || c.department || "—"}
+                  </div>
+                </li>
+              ))
+            ) : (
+              <li className="detail-recent-item">
+                <div className="detail-recent-name">No recent contacts</div>
+              </li>
+            )}
+          </ul>
+        </div>
       </div>
     );
   }
 
+  // When contact is selected, show only contact details (no "Recently added")
   return (
     <div className="detail-panel">
       <div className="detail-header">
         <div className="detail-avatar-wrap">
-          {/* Display Avatar (placeholder for now) */}
           <img
             src={contact.profilePicture || placeholder}
             alt=""
@@ -48,7 +87,7 @@ export default function ContactDetailPanel({ contact, recentContacts }) {
           </div>
           
           {/* Added Date Display in Header */}
-          <div style={{ fontSize: "0.8rem", color: "#999", marginTop: "6px" }}>
+          <div style={{ fontSize: "11px", color: "var(--text-tertiary)", marginTop: "4px" }}>
             <i className="bi bi-calendar3 me-1"></i>
             Added on {formatDate(contact.createdAt)}
           </div>
@@ -171,27 +210,6 @@ export default function ContactDetailPanel({ contact, recentContacts }) {
           </div>
         </div>
       )}
-
-      {/* Recent Contacts List (Footer) */}
-      <div className="detail-recent">
-        <div className="detail-recent-title">Recently added</div>
-        <ul className="detail-recent-list">
-          {recentContacts && recentContacts.length > 0 ? (
-            recentContacts.map((c) => (
-              <li key={c.id} className="detail-recent-item">
-                <div className="detail-recent-name">{c.name}</div>
-                <div className="detail-recent-role">
-                  {c.company || c.department || "—"}
-                </div>
-              </li>
-            ))
-          ) : (
-            <li className="detail-recent-item">
-              <div className="detail-recent-name">No recent contacts</div>
-            </li>
-          )}
-        </ul>
-      </div>
     </div>
   );
 }

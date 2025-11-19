@@ -14,7 +14,6 @@ export default function ContactsToolbar({
   onAdd,
   onExportCsv,
   onImportCsv,
-  onLogout,
 }) {
   const fileRef = useRef(null);
 
@@ -113,21 +112,6 @@ export default function ContactsToolbar({
         <button className="btn-new-contact" type="button" onClick={onAdd}>
           <i className="bi bi-plus-lg" />
           <span>New contact</span>
-        </button>
-
-        {/* Logout – right beside New contact */}
-        <button
-          type="button"
-          className="btn-new-contact"
-          style={{
-            marginLeft: "8px",
-            background: "#e5e7eb",
-            color: "#111827",
-            boxShadow: "none",
-          }}
-          onClick={onLogout}
-        >
-          Logout
         </button>
       </div>
     </div>

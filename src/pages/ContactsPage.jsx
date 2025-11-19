@@ -3,7 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { isAuthenticated, authAPI } from "../services/api.js";
 
-import LeftProfile from "../components/LeftProfile.jsx";
+import Sidebar from "../components/Sidebar.jsx";
 import ContactsToolbar from "../components/ContactsToolbar.jsx";
 import ContactFormModal from "../components/ContactFormModal.jsx";
 import ContactDetailPanel from "../components/ContactDetailPanel.jsx";
@@ -25,7 +25,8 @@ const PAGE_SIZE = 7;
 
 function groupContacts(contacts) {
   return contacts.reduce((acc, contact) => {
-    const nameForSorting = contact.lastName || contact.name || 'Unknown'; 
+    // Use firstName for grouping to match sorting, fallback to name
+    const nameForSorting = contact.firstName || contact.name || 'Unknown'; 
     const initial = nameForSorting.charAt(0).toUpperCase();
     if (!acc[initial]) acc[initial] = [];
     acc[initial].push(contact);
@@ -37,16 +38,15 @@ function sortContacts(contacts, mode, direction) {
   return [...contacts].sort((a, b) => {
     let aVal, bVal;
     if (mode === "recent") {
-      aVal = a.createdAt; bVal = b.createdAt;
-    } else {
-      aVal = a.firstName || a.name || "";
-      bVal = b.firstName || b.name || "";
-    }
-
-    if (mode === "recent") {
+      // Convert to numbers for proper comparison
+      aVal = typeof a.createdAt === 'number' ? a.createdAt : new Date(a.createdAt).getTime();
+      bVal = typeof b.createdAt === 'number' ? b.createdAt : new Date(b.createdAt).getTime();
       return direction === "asc" ? aVal - bVal : bVal - aVal;
     } else {
-      const comparison = aVal.localeCompare(bVal);
+      // Sort by first name
+      aVal = (a.firstName || a.name || "").trim();
+      bVal = (b.firstName || b.name || "").trim();
+      const comparison = aVal.localeCompare(bVal, undefined, { sensitivity: 'base' });
       return direction === "asc" ? comparison : -comparison;
     }
   });
@@ -223,7 +223,7 @@ export default function ContactsPage() {
   };
 
   const handleToggleStar = async (contact) => {
-    const updated = await toggleStar(contact.id, contact.starred);
+    const updated = await toggleStar(contact.id);
     if (updated) {
         setContacts(c => c.map(con => con.id === updated.id ? updated : con));
         if (activeContact?.id === updated.id) setActiveContact(updated);
@@ -275,9 +275,7 @@ export default function ContactsPage() {
   // --- RENDER ---
   return (
     <div className="contacts-page">
-      <div className="contacts-profile">
-        <LeftProfile />
-      </div>
+      <Sidebar onLogout={handleLogout} />
 
       <div className="contacts-main">
         <div className="contacts-topbar">
@@ -290,8 +288,7 @@ export default function ContactsPage() {
             filterMode={filterMode} setFilterMode={setFilterMode}
             onAdd={() => setModalState({ show: true, mode: "add", initial: null })}
             onExportCsv={handleExportCsv} 
-            onImportCsv={handleImportCsv} 
-            onLogout={handleLogout}
+            onImportCsv={handleImportCsv}
           />
         </div>
 
@@ -330,7 +327,11 @@ export default function ContactsPage() {
             </div>
           </div>
           <div className="contacts-detail">
-            <ContactDetailPanel contact={activeContact} recentContacts={recentContacts} />
+            <ContactDetailPanel 
+              contact={activeContact} 
+              recentContacts={recentContacts}
+              onSelectContact={setActiveContact}
+            />
           </div>
         </div>
       </div>

@@ -6,6 +6,7 @@ import { isAuthenticated } from "./services/api.js";
 import LandingPage from "./pages/LandingPage.jsx";
 import SignupPage from "./pages/SignupPage.jsx";
 import ContactsPage from "./pages/ContactsPage.jsx";
+import ProfilePage from "./pages/ProfilePage.jsx";
 
 // Protected Route Component
 function ProtectedRoute({ children }) {
@@ -26,6 +27,14 @@ export default function App() {
           element={
             <ProtectedRoute>
               <ContactsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/profile" 
+          element={
+            <ProtectedRoute>
+              <ProfilePage />
             </ProtectedRoute>
           } 
         />
